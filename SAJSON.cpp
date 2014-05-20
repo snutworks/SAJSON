@@ -2,17 +2,17 @@
 //	SAJSON.cpp
 //
 // Copyright (c) 2013 Natural Style Co. Ltd.
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -108,7 +108,7 @@ namespace SuperAnim{
 		SuperAnimImageVector mImageVector;
 	};
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	typedef std::map<std::string, SuperAnimMainDef> SuperAnimMainDefMap;
 	class SuperAnimDefMgr
 	{
@@ -123,13 +123,13 @@ namespace SuperAnim{
 	public:
 		static SuperAnimDefMgr *GetInstance();
 		static void DestroyInstance();
-
+		
 		// std::string theSuperAnimFile include the absolute path
 		SuperAnimMainDef *Load_GetSuperAnimMainDef(const std::string &theSuperAnimFile);
 		void UnloadSuperAnimMainDef(const std::string &theName);
 	};
-
-
+	
+	
 	SuperAnimSpriteId LoadSuperAnimSprite(std::string theSpriteName){
 		return InvalidSuperAnimSpriteId;
 	}
@@ -167,20 +167,20 @@ int main(int argc, char* argv[]){
 		printf("usage: SAJSON sam_path\n");
 		return 1;
 	}
-
+	
 	SuperAnim::SuperAnimMainDef* p = SuperAnim::SuperAnimDefMgr::GetInstance()->Load_GetSuperAnimMainDef(argv[1]);
 	
 	std::stringstream result;
 	
 	result << "{";
 	
-	result << "\"fps\":" << p->mAnimRate << ",";
-	result << "\"x\":" << p->mX << ",";
-	result << "\"y\":" << p->mY << ",";
-	result << "\"w\":" << p->mWidth << ",";
-	result << "\"h\":" << p->mHeight << ",";
+	result << "\"fps\":" << p->mAnimRate << ","; //mAnimRate
+	result << "\"x\":" << p->mX << ","; //mX
+	result << "\"y\":" << p->mY << ","; //mY
+	result << "\"w\":" << p->mWidth << ","; //mWidth
+	result << "\"h\":" << p->mHeight << ","; //mHeight
 	
-	result << "\"imgs\":";
+	result << "\"imgs\":"; //mImageVector
 	result << "[";
 	
 	std::stringstream images;
@@ -189,32 +189,33 @@ int main(int argc, char* argv[]){
 	for(SuperAnim::SuperAnimImageVector::const_iterator i=p->mImageVector.begin(); i!=p->mImageVector.end(); ++i){
 		images << imagesSeparator;
 		images << "{";
-		images << "\"img\": \""	<< i->mImageName.c_str() << "\",";
-//		images << "\"w\":"		<< i->mWidth << ",";
-//		images << "\"h\":"	<< i->mHeight << ",";
-		images << "\"t\":[";
+		images << "\"img\": \""	<< i->mImageName.c_str() << "\","; //mImageName
+//		images << "\"w\":"		<< i->mWidth << ","; //mWidth
+//		images << "\"h\":"	<< i->mHeight << ","; //mHeight
+		images << "\"t\":["; //mTransform:{mMatrix:{m:[[%f,%f,%f],[%f,%f,%f],[%f,%f,%f]]}} --> t: [%f, %f, %f, %f, %f, %f, %f, %f, %f];
 		images << i->mTransform.mMatrix.m[0][0] << ",";
 		images << i->mTransform.mMatrix.m[0][1] << ",";
 		images << i->mTransform.mMatrix.m[0][2] << ",";
 		images << i->mTransform.mMatrix.m[1][0] << ",";
 		images << i->mTransform.mMatrix.m[1][1] << ",";
-		images << i->mTransform.mMatrix.m[1][2] << ",";
-		images << i->mTransform.mMatrix.m[2][0] << ",";
-		images << i->mTransform.mMatrix.m[2][1] << ",";
-		images << i->mTransform.mMatrix.m[2][2];
+		images << i->mTransform.mMatrix.m[1][2];// << ",";
+//		images << i->mTransform.mMatrix.m[2][0] << ",";
+//		images << i->mTransform.mMatrix.m[2][1] << ",";
+//		images << i->mTransform.mMatrix.m[2][2];
 		images << "]";
 		images << "}";
-
+		
+		
 		imagesSeparator = ",";
 	}
 	
 	result << images.str();
 	result << "],";
 	
-	result << "\"sFrame\":" << p->mStartFrameNum << ",";
-	result << "\"eFrame\":" << p->mEndFrameNum << ",";
+	result << "\"sFrame\":" << p->mStartFrameNum << ","; //mStartFrameNum
+	result << "\"eFrame\":" << p->mEndFrameNum << ","; //mEndFrameNum
 	
-	result << "\"frames\":[";
+	result << "\"frames\":["; //mFrames
 	
 	std::stringstream frames;
 	std::string framesSeparator;
@@ -222,27 +223,28 @@ int main(int argc, char* argv[]){
 	for(SuperAnim::SuperAnimFrameVector::const_iterator i=p->mFrames.begin(); i!=p->mFrames.end(); ++i){
 		frames << framesSeparator;
 		frames << "{";
-		frames << "\"objects\":[";
-
+		frames << "\"objects\":["; //mObjectVector
+		
 		std::stringstream objects;
 		std::string objectsSeparator;
 		
 		for(SuperAnim::SuperAnimObjectVector::const_iterator j=i->mObjectVector.begin(); j!=i->mObjectVector.end(); ++j){
 			objects << objectsSeparator;
 			objects << "{";
-//			objects << "\"objNum\": "	<< j->mObjectNum << ",";
-			objects << "\"resNum\": "		<< j->mResNum	 << ",";
-			objects << "\"t\":";
+			
+//			objects << "\"objNum\": "	<< j->mObjectNum << ","; //mObjectNum
+			objects << "\"r\": "		<< j->mResNum	 << ","; //mResNum
+			objects << "\"t\":"; //mTransform:{mMatrix:{m:[[%f,%f,%f],[%f,%f,%f],[%f,%f,%f]]}} --> t: [%f, %f, %f, %f, %f, %f, %f, %f, %f];
 			objects << "[";
 			objects << j->mTransform.mMatrix.m[0][0] << ",";
 			objects << j->mTransform.mMatrix.m[0][1] << ",";
 			objects << j->mTransform.mMatrix.m[0][2] << ",";
 			objects << j->mTransform.mMatrix.m[1][0] << ",";
 			objects << j->mTransform.mMatrix.m[1][1] << ",";
-			objects << j->mTransform.mMatrix.m[1][2] << ",";
-			objects << j->mTransform.mMatrix.m[2][0] << ",";
-			objects << j->mTransform.mMatrix.m[2][1] << ",";
-			objects << j->mTransform.mMatrix.m[2][2];
+			objects << j->mTransform.mMatrix.m[1][2];// << ",";
+//			objects << j->mTransform.mMatrix.m[2][0] << ",";
+//			objects << j->mTransform.mMatrix.m[2][1] << ",";
+//			objects << j->mTransform.mMatrix.m[2][2];
 			objects << "]";
 			
 			SuperAnim::Color clr = j->mColor;
@@ -250,7 +252,7 @@ int main(int argc, char* argv[]){
 			
 			if (color > 0) {
 				objects << ",";
-				objects << "\"c\":" << color;
+				objects << "\"c\":" << color; //mColor: mRed, mGreen, mBlue, mAlpha --> c: hex color
 			}
 			
 			objects << "}";
@@ -268,9 +270,7 @@ int main(int argc, char* argv[]){
 	result << frames.str();
 	result << "],";
 	
-	//////
-	
-	result << "\"labels\": [";
+	result << "\"labels\": ["; //mLabels
 	
 	std::stringstream labels;
 	std::string labelsSeparator;
@@ -278,9 +278,9 @@ int main(int argc, char* argv[]){
 	for(SuperAnim::SuperAnimLabelArray::const_iterator i=p->mLabels.begin(); i!=p->mLabels.end(); ++i){
 		labels << labelsSeparator;
 		labels << "{";
-		labels << "\"name\":\"" << i->mLabelName.c_str() << "\",";
-		labels << "\"start\":" << i->mStartFrameNum << ",";
-		labels << "\"end\":" << i->mEndFrameNum;
+		labels << "\"name\":\"" << i->mLabelName.c_str() << "\","; //mLabelName
+		labels << "\"start\":" << i->mStartFrameNum << ","; //mStartFrameNum
+		labels << "\"end\":" << i->mEndFrameNum; //mEndFrameNum
 		labels << "}";
 		
 		labelsSeparator = ",";
